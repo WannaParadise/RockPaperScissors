@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>RockPaperScissors Dapp</title>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <script type="text/javascript">
+      const CONTRACT_ADDRESS = "0xb014bF4b8e84A7f6568696E8298EB881fe631008";
+      const ABI = [
+	{
+		"inputs": [],
+		"name": "botMove1",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "move",
+				"type": "uint8"
+			}
+		],
+		"name": "submitMove",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "botMove",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "gameFinished",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getWinner",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "playerAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "playerMove",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+      let provider, signer, contract;
+
+      async function connect() {
+        if (typeof window.ethereum === "undefined") {
+          alert("Please install MetaMask to use this dapp!");
+        } else {
+          try {
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+            document.getElementById("connect-button").style.display = "none";
+            document.getElementById("move-buttons").style.display = "block";
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+
+      async function submitMove(move) {
+        try {
+          await contract.submitMove(move);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      async function botMove() {
+        try {
+          await contract.botMove1();
+          const result = await contract.getWinner();
+          document.getElementById("result").innerText = result;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>RockPaperScissors Dapp</h1>
+    <button id="connect-button" onclick="connect()">Connect MetaMask</button>
+    <div id="move-buttons" style="display: none;">
+      <h2>Make your move:</h2>
+      <button onclick="submitMove(1)">Rock</button>
+      <button onclick="submitMove(2)">Paper</button>
+      <button onclick="submitMove(3)">Scissors</button>
+      <h2>Bot's move:</h2>
+      <button onclick="botMove()">Make bot move</button>
+      <h2>Result:</h2>
+      <div id="result"></div>
+    </div>
+  </body>
+</html>
